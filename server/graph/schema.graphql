@@ -1,0 +1,40 @@
+type Perk @entity {
+  id: ID!
+  price: BigInt!
+  expiration: BigInt!
+  cooldown: BigInt!
+  name: String!
+  role: String!
+}
+
+type Role @entity {
+  id: ID!
+}
+
+type Token @entity {
+  id: ID!
+  address: String!
+  supply: BigInt!
+}
+
+type User @entity {
+  id: ID!
+  perks: [PerkOwnership!]! @derivedFrom(field: "owner")
+  token: Token!
+  role: Role
+  holders: BigInt!
+  holdings: BigInt!
+}
+
+type PerkOwnership @entity {
+  id: ID!
+  owner: User!
+  perk: Perk!
+}
+
+type TokenOwnership @entity {
+  id: ID!
+  owner: User!
+  subject: Token!
+  amount: BigInt!
+}

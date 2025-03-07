@@ -1,0 +1,3 @@
+mutation SignIn($signature: String!, $walletAddress: String!) {
+  signIn(signature: $signature, walletAddress: $walletAddress)
+}

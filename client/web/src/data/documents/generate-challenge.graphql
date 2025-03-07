@@ -1,0 +1,3 @@
+mutation GenerateChallenge($walletAddress: String!) {
+  generateChallenge(walletAddress: $walletAddress)
+}

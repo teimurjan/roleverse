@@ -1,0 +1,16 @@
+query GetUsersByOmittingRole($role: ID!) {
+  users(where: { role_: { id_not_in: [$role] } }) {
+    id
+    perks {
+      id
+      perk {
+        id
+        expiration
+        name
+      }
+    }
+    role {
+      id
+    }
+  }
+}

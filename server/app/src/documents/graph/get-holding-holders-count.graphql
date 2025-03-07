@@ -1,0 +1,6 @@
+query GetHoldingHoldersCount($walletAddress: ID!) {
+  user(id: $walletAddress) {
+    holdings
+    holders
+  }
+}

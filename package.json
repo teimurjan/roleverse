@@ -1,0 +1,23 @@
+{
+  "name": "@roleverse/root",
+  "packageManager": "yarn@4.6.0",
+  "workspaces": [
+    "server/**",
+    "client/**",
+    "lib/**",
+    "contract/**"
+  ],
+  "engines": {
+    "node": ">=20.18.1"
+  },
+  "devDependencies": {
+    "@yarnpkg/types": "^4.0.0",
+    "compare-versions": "^6.1.1",
+    "eslint": "9.x",
+    "nx": "20.2.2",
+    "prettier": "^3.2.5"
+  },
+  "resolutions": {
+    "@graphql-tools/executor-http": "1.2.8"
+  }
+}

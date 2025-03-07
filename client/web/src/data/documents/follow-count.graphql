@@ -1,0 +1,6 @@
+query FollowCount($walletAddress: String) {
+  followCount(walletAddress: $walletAddress) {
+    following
+    followers
+  }
+}

@@ -1,0 +1,24 @@
+query GetTokenHolders($walletAddress: String!, $limit: Int!, $offset: Int!) {
+  tokenOwnerships(where: { subject: $walletAddress }, first: $limit, skip: $offset) {
+    id
+    owner {
+      id
+      perks {
+        id
+        perk {
+          expiration
+          id
+          price
+        }
+      }
+      role {
+        id
+      }
+      token {
+        address
+        id
+        supply
+      }
+    }
+  }
+}

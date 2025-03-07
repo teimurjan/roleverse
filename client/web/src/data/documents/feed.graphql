@@ -1,0 +1,30 @@
+query Feed($limit: Int, $offset: Int) {
+  feed(limit: $limit, offset: $offset) {
+    id
+    text
+    user {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    likes {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    links
+    tags {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}

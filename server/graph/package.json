@@ -1,0 +1,22 @@
+{
+  "name": "@roleverse/server-graph",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "create-local": "graph create --node \"${GRAPH_NODE_URL:-http://localhost:8020/}\" roleverse-local",
+    "remove-local": "graph remove --node \"${GRAPH_NODE_URL:-http://localhost:8020/}\" roleverse-local",
+    "deploy-local": "graph deploy --node \"${GRAPH_NODE_URL:-http://localhost:8020/}\" --ipfs \"${IPFS_URL:-http://localhost:5001/}\" roleverse-local --version-label v0.0.1"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.95.0",
+    "@graphprotocol/graph-ts": "0.36.0"
+  },
+  "devDependencies": {
+    "matchstick-as": "0.6.0"
+  },
+  "engines": {
+    "node": ">=20.18.1"
+  }
+}

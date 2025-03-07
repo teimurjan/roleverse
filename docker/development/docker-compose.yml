@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${SERVER_APP__DB_USERNAME}
+      POSTGRES_PASSWORD: ${SERVER_APP__DB_PASSWORD}
+      PGDATA: /data/postgres
+      POSTGRES_DB: ${SERVER_APP__DB_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./volumes/db:/data/postgres
+
+  server:
+    depends_on:
+      - db
+    build:
+      context: ../../
+      additional_contexts:
+        workspace: ../../
+      dockerfile: ./server/app/Dockerfile.dev
+    container_name: server
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      SERVER_PORT: 8080
+      SERVER_HOST: ${SERVER_APP__SERVER_HOST}
+      DB_USERNAME: ${SERVER_APP__DB_USERNAME}
+      DB_PASSWORD: ${SERVER_APP__DB_PASSWORD}
+      DB_NAME: ${SERVER_APP__DB_NAME}
+      DB_HOST: db
+      DB_PORT: 5432
+      JWT_SECRET: ${SERVER_APP__JWT_SECRET}
+      ROLEVERSE_GRAPHQL_ENDPOINT: http://graph-node:8000/subgraphs/name/roleverse-local
+    volumes:
+      - ../../server/app:/app/server/app
+      - ../../node_modules:/app/node_modules
+
+  blockchain:
+    build:
+      context: ../../
+      additional_contexts:
+        workspace: ../../
+      dockerfile: ./contract/roleverse/Dockerfile.dev
+    container_name: blockchain
+    restart: always
+    ports:
+      - 8545:8545
+    volumes:
+      - ../../contract/roleverse:/app/contract/roleverse
+      - ../../node_modules:/app/node_modules
+
+  ipfs:
+    image: ipfs/go-ipfs:latest
+    container_name: ipfs
+    ports:
+      - "5001:5001"
+      - "8081:8080"
+    volumes:
+      - ./volumes/ipfs_data:/data/ipfs
+      - ./volumes/ipfs_staging:/export
+
+  graphdb:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${SERVER_GRAPH__DB_USERNAME}
+      POSTGRES_PASSWORD: ${SERVER_GRAPH__DB_PASSWORD}
+      PGDATA: /data/postgres
+      POSTGRES_DB: ${SERVER_GRAPH__DB_NAME}
+      POSTGRES_INITDB_ARGS: "-E UTF8 --locale=C"
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./volumes/graphdb:/data/postgres
+
+  graph-node:
+    image: graphprotocol/graph-node:latest
+    container_name: graph-node
+    ports:
+      - "8000:8000" # GraphQL endpoint
+      - "8020:8020" # Admin endpoint
+      - "8030:8030" # Optional metrics endpoint
+    depends_on:
+      - graphdb
+      - ipfs
+      - blockchain
+    environment:
+      GRAPH_LOG: info
+      postgres_host: graphdb
+      postgres_user: ${SERVER_GRAPH__DB_USERNAME}
+      postgres_pass: ${SERVER_GRAPH__DB_PASSWORD}
+      postgres_db: ${SERVER_GRAPH__DB_NAME}
+      ipfs: "ipfs:5001"
+      ethereum: "hardhat:http://blockchain:8545"
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "nc -zv localhost 8020" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 30s
+
+  init-graph-node:
+    depends_on:
+      graph-node:
+        condition: service_healthy
+    build:
+      context: ../../
+      additional_contexts:
+        workspace: ../../
+      dockerfile: ./server/graph/Dockerfile.dev
+    container_name: init-graph-node
+    environment:
+      GRAPH_NODE_URL: http://graph-node:8020
+      IPFS_URL: http://ipfs:5001

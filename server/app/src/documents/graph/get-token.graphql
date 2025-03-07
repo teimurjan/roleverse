@@ -1,0 +1,6 @@
+query GetToken($walletAddress: ID!) {
+  token(id: $walletAddress) {
+    id
+    supply
+  }
+}

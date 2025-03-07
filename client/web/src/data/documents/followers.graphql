@@ -1,0 +1,9 @@
+query Followers($limit: Int, $offset: Int, $walletAddress: String) {
+  followers(limit: $limit, offset: $offset, walletAddress: $walletAddress) {
+    id
+    walletAddress
+    username
+    createdAt
+    updatedAt
+  }
+}

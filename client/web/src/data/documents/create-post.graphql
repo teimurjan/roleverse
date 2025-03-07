@@ -1,0 +1,30 @@
+mutation CreatePost($text: String!) {
+  createPost(text: $text) {
+    id
+    text
+    user {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    likes {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    links
+    tags {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}

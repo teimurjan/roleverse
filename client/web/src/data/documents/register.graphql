@@ -1,0 +1,11 @@
+mutation Register(
+  $signature: String!
+  $username: String!
+  $walletAddress: String!
+) {
+  register(
+    signature: $signature
+    username: $username
+    walletAddress: $walletAddress
+  )
+}

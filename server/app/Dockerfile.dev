@@ -1,0 +1,16 @@
+FROM node:alpine
+
+WORKDIR /app
+
+COPY --from=workspace .yarn/ ./.yarn
+COPY --from=workspace .yarnrc.yml ./
+COPY --from=workspace package.json ./
+COPY --from=workspace yarn.lock ./
+
+
+COPY --from=workspace ./server/app ./server/app
+COPY --from=workspace ./lib/format-config ./lib/format-config
+
+RUN yarn workspaces focus @roleverse/root @roleverse/server-app @roleverse/format-config
+
+CMD ["yarn", "workspace", "@roleverse/server-app", "start"]

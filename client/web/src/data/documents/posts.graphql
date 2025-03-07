@@ -1,0 +1,30 @@
+query Posts($limit: Int, $offset: Int, $liked: Boolean) {
+  posts(limit: $limit, offset: $offset, liked: $liked) {
+    id
+    text
+    user {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    likes {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    links
+    tags {
+      id
+      walletAddress
+      username
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
