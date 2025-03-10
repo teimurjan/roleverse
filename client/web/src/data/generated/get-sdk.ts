@@ -19,8 +19,19 @@ export type Scalars = {
   DateTimeISO: { input: any; output: any; }
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  createdAt: Scalars['DateTimeISO']['output'];
+  id: Scalars['ID']['output'];
+  tags?: Maybe<Array<User>>;
+  text: Scalars['String']['output'];
+  updatedAt: Scalars['DateTimeISO']['output'];
+  user: User;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  createComment: Comment;
   createPost: Post;
   generateChallenge: Scalars['String']['output'];
   likePost: Post;
@@ -28,6 +39,12 @@ export type Mutation = {
   register: Scalars['Boolean']['output'];
   signIn: Scalars['Boolean']['output'];
   unlikePost: Post;
+};
+
+
+export type MutationCreateCommentArgs = {
+  postId: Scalars['String']['input'];
+  text: Scalars['String']['input'];
 };
 
 
@@ -65,9 +82,11 @@ export type MutationUnlikePostArgs = {
 
 export type Post = {
   __typename?: 'Post';
+  commentsCount: Scalars['Int']['output'];
   createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['ID']['output'];
-  likes?: Maybe<Array<User>>;
+  isLiked: Scalars['Boolean']['output'];
+  likesCount: Scalars['Int']['output'];
   links?: Maybe<Array<Scalars['String']['output']>>;
   tags?: Maybe<Array<User>>;
   text: Scalars['String']['output'];
@@ -77,13 +96,23 @@ export type Post = {
 
 export type Query = {
   __typename?: 'Query';
+  comments: Array<Comment>;
   explore: Array<Post>;
   feed: Array<Post>;
   followCount: UserFollowCount;
   followers: Array<User>;
   following: Array<User>;
   me: User;
+  post: Post;
   posts: Array<Post>;
+  user: User;
+};
+
+
+export type QueryCommentsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  postId: Scalars['String']['input'];
 };
 
 
@@ -100,21 +129,26 @@ export type QueryFeedArgs = {
 
 
 export type QueryFollowCountArgs = {
-  walletAddress?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type QueryFollowersArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
-  walletAddress?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
 export type QueryFollowingArgs = {
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
-  walletAddress?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryPostArgs = {
+  postId: Scalars['String']['input'];
 };
 
 
@@ -122,6 +156,12 @@ export type QueryPostsArgs = {
   liked?: Scalars['Boolean']['input'];
   limit?: Scalars['Int']['input'];
   offset?: Scalars['Int']['input'];
+  userId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryUserArgs = {
+  id: Scalars['String']['input'];
 };
 
 export type User = {
@@ -139,12 +179,31 @@ export type UserFollowCount = {
   following: Scalars['Float']['output'];
 };
 
+export type Comment_Fragment = { __typename?: 'Comment', id: string, text: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null };
+
+export type CommentsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type CommentsQuery = { __typename?: 'Query', comments: Array<{ __typename?: 'Comment', id: string, text: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
+
+export type CreateCommentMutationVariables = Exact<{
+  text: Scalars['String']['input'];
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type CreateCommentMutation = { __typename?: 'Mutation', createComment: { __typename?: 'Comment', id: string, text: string, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null } };
+
 export type CreatePostMutationVariables = Exact<{
   text: Scalars['String']['input'];
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: string, text: string, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, likes?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null } };
 
 export type ExploreQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -152,7 +211,7 @@ export type ExploreQueryVariables = Exact<{
 }>;
 
 
-export type ExploreQuery = { __typename?: 'Query', explore: Array<{ __typename?: 'Post', id: string, text: string, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, likes?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
+export type ExploreQuery = { __typename?: 'Query', explore: Array<{ __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
 
 export type FeedQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -160,10 +219,10 @@ export type FeedQueryVariables = Exact<{
 }>;
 
 
-export type FeedQuery = { __typename?: 'Query', feed: Array<{ __typename?: 'Post', id: string, text: string, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, likes?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
+export type FeedQuery = { __typename?: 'Query', feed: Array<{ __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
 
 export type FollowCountQueryVariables = Exact<{
-  walletAddress?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -172,7 +231,7 @@ export type FollowCountQuery = { __typename?: 'Query', followCount: { __typename
 export type FollowersQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  walletAddress?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -181,7 +240,7 @@ export type FollowersQuery = { __typename?: 'Query', followers: Array<{ __typena
 export type FollowingQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  walletAddress?: InputMaybe<Scalars['String']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
@@ -211,14 +270,24 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any } };
 
+export type Post_Fragment = { __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null };
+
+export type PostQueryVariables = Exact<{
+  postId: Scalars['String']['input'];
+}>;
+
+
+export type PostQuery = { __typename?: 'Query', post: { __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null } };
+
 export type PostsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   liked?: InputMaybe<Scalars['Boolean']['input']>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: string, text: string, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, likes?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
+export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
 
 export type RegisterMutationVariables = Exact<{
   signature: Scalars['String']['input'];
@@ -244,133 +313,113 @@ export type UnlikePostMutationVariables = Exact<{
 
 export type UnlikePostMutation = { __typename?: 'Mutation', unlikePost: { __typename?: 'Post', id: string } };
 
+export type User_Fragment = { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any };
 
+export type UserQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type UserQuery = { __typename?: 'Query', user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any } };
+
+export const User_FragmentDoc = gql`
+    fragment User_ on User {
+  id
+  walletAddress
+  username
+  createdAt
+  updatedAt
+}
+    `;
+export const Comment_FragmentDoc = gql`
+    fragment Comment_ on Comment {
+  id
+  text
+  user {
+    ...User_
+  }
+  tags {
+    ...User_
+  }
+  createdAt
+  updatedAt
+}
+    ${User_FragmentDoc}`;
+export const Post_FragmentDoc = gql`
+    fragment Post_ on Post {
+  id
+  text
+  user {
+    ...User_
+  }
+  isLiked
+  likesCount
+  commentsCount
+  links
+  tags {
+    ...User_
+  }
+  createdAt
+  updatedAt
+}
+    ${User_FragmentDoc}`;
+export const CommentsDocument = gql`
+    query Comments($limit: Int, $offset: Int, $postId: String!) {
+  comments(limit: $limit, offset: $offset, postId: $postId) {
+    ...Comment_
+  }
+}
+    ${Comment_FragmentDoc}`;
+export const CreateCommentDocument = gql`
+    mutation CreateComment($text: String!, $postId: String!) {
+  createComment(text: $text, postId: $postId) {
+    ...Comment_
+  }
+}
+    ${Comment_FragmentDoc}`;
 export const CreatePostDocument = gql`
     mutation CreatePost($text: String!) {
   createPost(text: $text) {
-    id
-    text
-    user {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    likes {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    links
-    tags {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
+    ...Post_
   }
 }
-    `;
+    ${Post_FragmentDoc}`;
 export const ExploreDocument = gql`
     query Explore($limit: Int, $offset: Int) {
   explore(limit: $limit, offset: $offset) {
-    id
-    text
-    user {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    likes {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    links
-    tags {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
+    ...Post_
   }
 }
-    `;
+    ${Post_FragmentDoc}`;
 export const FeedDocument = gql`
     query Feed($limit: Int, $offset: Int) {
   feed(limit: $limit, offset: $offset) {
-    id
-    text
-    user {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    likes {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    links
-    tags {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
+    ...Post_
   }
 }
-    `;
+    ${Post_FragmentDoc}`;
 export const FollowCountDocument = gql`
-    query FollowCount($walletAddress: String) {
-  followCount(walletAddress: $walletAddress) {
+    query FollowCount($userId: String) {
+  followCount(userId: $userId) {
     following
     followers
   }
 }
     `;
 export const FollowersDocument = gql`
-    query Followers($limit: Int, $offset: Int, $walletAddress: String) {
-  followers(limit: $limit, offset: $offset, walletAddress: $walletAddress) {
-    id
-    walletAddress
-    username
-    createdAt
-    updatedAt
+    query Followers($limit: Int, $offset: Int, $userId: String) {
+  followers(limit: $limit, offset: $offset, userId: $userId) {
+    ...User_
   }
 }
-    `;
+    ${User_FragmentDoc}`;
 export const FollowingDocument = gql`
-    query Following($limit: Int, $offset: Int, $walletAddress: String) {
-  following(limit: $limit, offset: $offset, walletAddress: $walletAddress) {
-    id
-    walletAddress
-    username
-    createdAt
-    updatedAt
+    query Following($limit: Int, $offset: Int, $userId: String) {
+  following(limit: $limit, offset: $offset, userId: $userId) {
+    ...User_
   }
 }
-    `;
+    ${User_FragmentDoc}`;
 export const GenerateChallengeDocument = gql`
     mutation GenerateChallenge($walletAddress: String!) {
   generateChallenge(walletAddress: $walletAddress)
@@ -391,46 +440,24 @@ export const LogOutDocument = gql`
 export const MeDocument = gql`
     query Me {
   me {
-    id
-    walletAddress
-    username
-    createdAt
-    updatedAt
+    ...User_
   }
 }
-    `;
+    ${User_FragmentDoc}`;
+export const PostDocument = gql`
+    query Post($postId: String!) {
+  post(postId: $postId) {
+    ...Post_
+  }
+}
+    ${Post_FragmentDoc}`;
 export const PostsDocument = gql`
-    query Posts($limit: Int, $offset: Int, $liked: Boolean) {
-  posts(limit: $limit, offset: $offset, liked: $liked) {
-    id
-    text
-    user {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    likes {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    links
-    tags {
-      id
-      walletAddress
-      username
-      createdAt
-      updatedAt
-    }
-    createdAt
-    updatedAt
+    query Posts($limit: Int, $offset: Int, $liked: Boolean, $userId: String) {
+  posts(limit: $limit, offset: $offset, liked: $liked, userId: $userId) {
+    ...Post_
   }
 }
-    `;
+    ${Post_FragmentDoc}`;
 export const RegisterDocument = gql`
     mutation Register($signature: String!, $username: String!, $walletAddress: String!) {
   register(
@@ -452,6 +479,13 @@ export const UnlikePostDocument = gql`
   }
 }
     `;
+export const UserDocument = gql`
+    query User($id: String!) {
+  user(id: $id) {
+    ...User_
+  }
+}
+    ${User_FragmentDoc}`;
 
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: any) => Promise<T>;
 
@@ -460,6 +494,12 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    Comments(variables: CommentsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CommentsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CommentsQuery>(CommentsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Comments', 'query', variables);
+    },
+    CreateComment(variables: CreateCommentMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateCommentMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateCommentMutation>(CreateCommentDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateComment', 'mutation', variables);
+    },
     CreatePost(variables: CreatePostMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreatePostMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<CreatePostMutation>(CreatePostDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreatePost', 'mutation', variables);
     },
@@ -490,6 +530,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     Me(variables?: MeQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<MeQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<MeQuery>(MeDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Me', 'query', variables);
     },
+    Post(variables: PostQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PostQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<PostQuery>(PostDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Post', 'query', variables);
+    },
     Posts(variables?: PostsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PostsQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<PostsQuery>(PostsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Posts', 'query', variables);
     },
@@ -501,6 +544,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     UnlikePost(variables: UnlikePostMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UnlikePostMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UnlikePostMutation>(UnlikePostDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UnlikePost', 'mutation', variables);
+    },
+    User(variables: UserQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UserQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UserQuery>(UserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'User', 'query', variables);
     }
   };
 }

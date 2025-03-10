@@ -1,9 +1,5 @@
-query Following($limit: Int, $offset: Int, $walletAddress: String) {
-  following(limit: $limit, offset: $offset, walletAddress: $walletAddress) {
-    id
-    walletAddress
-    username
-    createdAt
-    updatedAt
+query Following($limit: Int, $offset: Int, $userId: String) {
+  following(limit: $limit, offset: $offset, userId: $userId) {
+    ...User_
   }
 }

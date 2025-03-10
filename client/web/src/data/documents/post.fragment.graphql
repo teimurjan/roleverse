@@ -1,0 +1,16 @@
+fragment Post_ on Post {
+  id
+  text
+  user {
+    ...User_
+  }
+  isLiked
+  likesCount
+  commentsCount
+  links
+  tags {
+    ...User_
+  }
+  createdAt
+  updatedAt
+}

@@ -20,15 +20,24 @@ class UserResolver {
     return this.userService.getUser(user.id)
   }
 
+  @Query(() => User)
+  @UseMiddleware(AuthorizationMiddleware)
+  async user(@Arg('id', () => String) id: string): Promise<User | null> {
+    return this.userService.getUser(id)
+  }
+
   @Query(() => [User])
   @UseMiddleware(AuthorizationMiddleware)
   async followers(
-    @Arg('walletAddress', () => String, { nullable: true })
-    walletAddress: string | null,
+    @Arg('userId', () => String, { nullable: true })
+    userId: string | null,
     @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
     @Arg('offset', () => Int, { defaultValue: 0 }) offset: number,
     @Ctx('user') user: User,
   ): Promise<User[]> {
+    const walletAddress = userId
+      ? (await this.userService.getUser(userId)).walletAddress
+      : undefined
     return this.graphService.getFollowers(
       walletAddress ?? user.walletAddress,
       limit,
@@ -39,12 +48,15 @@ class UserResolver {
   @Query(() => [User])
   @UseMiddleware(AuthorizationMiddleware)
   async following(
-    @Arg('walletAddress', () => String, { nullable: true })
-    walletAddress: string | null,
+    @Arg('userId', () => String, { nullable: true })
+    userId: string | null,
     @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
     @Arg('offset', () => Int, { defaultValue: 0 }) offset: number,
     @Ctx('user') user: User,
   ): Promise<User[]> {
+    const walletAddress = userId
+      ? (await this.userService.getUser(userId)).walletAddress
+      : undefined
     return this.graphService.getFollowing(
       walletAddress ?? user.walletAddress,
       limit,
@@ -55,10 +67,13 @@ class UserResolver {
   @Query(() => UserFollowCount)
   @UseMiddleware(AuthorizationMiddleware)
   async followCount(
-    @Arg('walletAddress', () => String, { nullable: true })
-    walletAddress: string | null,
+    @Arg('userId', () => String, { nullable: true })
+    userId: string | null,
     @Ctx('user') user: User,
   ): Promise<UserFollowCount> {
+    const walletAddress = userId
+      ? (await this.userService.getUser(userId)).walletAddress
+      : undefined
     return this.graphService.getFollowCount(walletAddress ?? user.walletAddress)
   }
 }

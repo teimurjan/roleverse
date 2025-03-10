@@ -3,9 +3,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
+
+import Comment from './comment'
+import Post from './post'
 
 @Entity()
 @ObjectType()
@@ -17,6 +21,12 @@ class User {
   @Column({ unique: true })
   @Field()
   walletAddress: string
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[]
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[]
 
   @Column({ unique: true })
   @Field()

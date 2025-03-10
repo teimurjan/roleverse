@@ -1,0 +1,7 @@
+fragment User_ on User {
+  id
+  walletAddress
+  username
+  createdAt
+  updatedAt
+}

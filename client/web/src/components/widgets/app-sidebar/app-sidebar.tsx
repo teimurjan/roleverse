@@ -1,11 +1,12 @@
 "use client";
 
-import { Copy, Globe, Heart, LogOut, Newspaper } from "lucide-react";
+import { Globe, Heart, LogOut, Newspaper } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAccount } from "wagmi";
 
+import CopyAddress from "@/components/dumb/copy-address";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
@@ -17,30 +18,23 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import useFollowCount from "@/data/hooks/use-follow-count";
-import { toast } from "@/hooks/use-toast";
+import useIsClient from "@/hooks/use-is-client";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/providers/auth";
-import shortenAddress from "@/utils/shorten-address";
+
+import AppRightSidebar from "../app-right-sidebar";
+import FollowCount from "../follow-count";
 
 const AppSidebar = () => {
   const { address } = useAccount();
   const { user, logOut } = useAuth();
-  const { data: followCount } = useFollowCount({ walletAddress: address });
+  const pathname = usePathname();
+  const isMobile = useIsMobile();
 
-  const handleCopy = async () => {
-    if (!address) {
-      return;
-    }
-
-    await navigator.clipboard.writeText(address);
-    toast({
-      title: "Copied address to clipboard",
-      description: shortenAddress(address),
-    });
-  };
+  const isClient = useIsClient();
 
   return (
-    <Sidebar>
+    <Sidebar variant="floating">
       <SidebarContent>
         <div className="pt-4 px-3">
           {address && (
@@ -52,35 +46,16 @@ const AppSidebar = () => {
             </Avatar>
           )}
 
-          {address && (
-            <div className="flex items-center gap-2">
-              <span className="text-small font-bold">
-                {shortenAddress(address)}
-              </span>
-              <Button variant="ghost" size="icon-sm" onClick={handleCopy}>
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-
           {user && (
-            <p className="text-slate-500 text-xs">@{user.me.username}</p>
+            <Link href={`/profile/${user.me.id}`} className="font-bold">
+              @{user.me.username}
+            </Link>
           )}
+
+          {address && <CopyAddress address={address} />}
         </div>
 
-        <div className="flex items-center gap-2">
-          <Link href="/following">
-            <Button variant="link">
-              {followCount?.followCount.following} Following
-            </Button>
-          </Link>
-          <Link href="/followers">
-            <Button variant="link">
-              {followCount?.followCount.followers} Follower
-              {followCount?.followCount.followers !== 1 && "s"}
-            </Button>
-          </Link>
-        </div>
+        <FollowCount className="px-3" userId={user?.me.id} />
 
         <Separator className="mt-2" />
 
@@ -88,7 +63,11 @@ const AppSidebar = () => {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild size="lg">
+                <SidebarMenuButton
+                  asChild
+                  isActive={isClient && pathname === "/"}
+                  size="lg"
+                >
                   <Link href="/">
                     <Newspaper />
                     <span>Feed</span>
@@ -96,24 +75,34 @@ const AppSidebar = () => {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild size="lg">
-                  <a href="/explore">
+                <SidebarMenuButton
+                  asChild
+                  isActive={isClient && pathname === "/explore"}
+                  size="lg"
+                >
+                  <Link href="/explore">
                     <Globe />
                     <span>Explore</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild size="lg">
-                  <a href="/liked">
+                <SidebarMenuButton
+                  asChild
+                  isActive={isClient && pathname === "/liked"}
+                  size="lg"
+                >
+                  <Link href="/liked">
                     <Heart />
                     <span>Liked</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {isMobile && <AppRightSidebar />}
       </SidebarContent>
 
       <SidebarFooter>

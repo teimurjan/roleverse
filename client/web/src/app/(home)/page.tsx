@@ -1,7 +1,7 @@
 import React from "react";
 
 import CreatePostForm from "@/components/widgets/create-post-form";
-import Feed from "@/components/widgets/feed";
+import FeedPostList from "@/components/widgets/feed-post-list";
 import MintDialog from "@/components/widgets/mint-dialog";
 
 const Home = () => {
@@ -12,7 +12,7 @@ const Home = () => {
       <CreatePostForm />
 
       <div className="flex-1 overflow-y-auto pb-4">
-        <Feed />
+        <FeedPostList />
       </div>
 
       <MintDialog />

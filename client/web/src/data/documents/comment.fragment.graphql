@@ -1,0 +1,12 @@
+fragment Comment_ on Comment {
+  id
+  text
+  user {
+    ...User_
+  }
+  tags {
+    ...User_
+  }
+  createdAt
+  updatedAt
+}

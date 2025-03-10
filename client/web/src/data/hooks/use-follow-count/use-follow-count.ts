@@ -6,12 +6,12 @@ import { useDataSdk } from "@/providers/data-sdk";
 
 export type UseFollowCountArgs = FollowCountQueryVariables;
 
-const useFollowCount = ({ walletAddress }: UseFollowCountArgs) => {
+const useFollowCount = ({ userId }: UseFollowCountArgs) => {
   const { sdk } = useDataSdk();
   return useQuery({
     queryKey: [QueryKey.FollowCount],
-    queryFn: () => sdk.FollowCount({ walletAddress }),
-    enabled: !!walletAddress,
+    queryFn: () => sdk.FollowCount({ userId }),
+    enabled: !!userId,
   });
 };
 

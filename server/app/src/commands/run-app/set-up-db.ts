@@ -1,4 +1,5 @@
 import config from '@src/config'
+import Comment from '@src/models/comment'
 import Post from '@src/models/post'
 import User from '@src/models/user'
 import { DataSource } from 'typeorm'
@@ -11,7 +12,7 @@ const setUpDb = async () => {
     username: config.db.username,
     password: config.db.password,
     database: config.db.name,
-    entities: [User, Post],
+    entities: [User, Post, Comment],
     synchronize: config.environment === 'development',
     logging: false,
   })

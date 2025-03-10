@@ -39,7 +39,7 @@ const CreatePostForm = () => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      await mutateAsync(data.text);
+      await mutateAsync(data);
     } catch (_e) {
       toast({
         title: "Something went wrong",

@@ -1,10 +1,12 @@
 import Post from '@src/models/post'
 import User from '@src/models/user'
 import PostRepository from '@src/repositories/post'
-import UserRepository from '@src/repositories/user'
+import extractExternalLinks from '@src/utils/extract-external-links'
+import extractTaggedUsernames from '@src/utils/extract-tagged-usernames'
 import { Service } from 'typedi'
 
 import GraphService from './graph'
+import UserService from './user'
 
 export class EmptyPostError extends Error {
   constructor() {
@@ -22,27 +24,11 @@ export class PostNotFoundError extends Error {
   }
 }
 
-function extractExternalLinks(text: string): string[] {
-  const urlRegex = /(https?:\/\/[^\s]+)/g
-  const matches = text.match(urlRegex)
-  return matches || []
-}
-
-function extractTaggedUsernames(text: string): string[] {
-  const tagRegex = /@(\w+)/g
-  const usernames = new Set<string>()
-  let match
-  while ((match = tagRegex.exec(text)) !== null) {
-    usernames.add(match[1])
-  }
-  return Array.from(usernames)
-}
-
 @Service()
 class PostService {
   constructor(
     private postRepo: PostRepository,
-    private userRepo: UserRepository,
+    private userService: UserService,
     private graphService: GraphService,
   ) {}
 
@@ -55,7 +41,9 @@ class PostService {
     const usernames = extractTaggedUsernames(text)
 
     const tags: User[] =
-      usernames.length > 0 ? await this.userRepo.findByUsernames(usernames) : []
+      usernames.length > 0
+        ? await this.userService.getByUsernames(usernames)
+        : []
 
     const post = new Post()
     post.text = text
@@ -63,26 +51,36 @@ class PostService {
     post.tags = tags
     post.user = user
 
-    return await this.postRepo.create(post)
+    return await this.postRepo.save(post)
   }
 
-  async getPosts(limit: number, offset: number, liker?: User): Promise<Post[]> {
-    return await this.postRepo.findAll(
-      limit,
-      offset,
-      liker
-        ? {
-            liker: liker.id,
-          }
-        : undefined,
-    )
+  async getPosts(
+    limit: number,
+    offset: number,
+    liker?: User,
+    userId?: string,
+  ): Promise<Post[]> {
+    return await this.postRepo.findAll(limit, offset, {
+      likedUserIds: liker ? [liker.id] : undefined,
+      userIds: userId ? [userId] : undefined,
+    })
   }
 
-  async like(postId: string, user: User): Promise<Post> {
-    const post = await this.postRepo.findById(postId)
+  async getPostSafe(postId: string): Promise<Post | null> {
+    return await this.postRepo.findById(postId)
+  }
+
+  async getPost(postId: string): Promise<Post> {
+    const post = await this.getPostSafe(postId)
     if (!post) {
       throw new PostNotFoundError()
     }
+
+    return post
+  }
+
+  async like(postId: string, user: User): Promise<Post> {
+    const post = await this.getPost(postId)
     const likes = post.likes ?? []
 
     const alreadyLiked = likes.some((userLiked) => userLiked.id === user.id)
@@ -98,10 +96,7 @@ class PostService {
   }
 
   async unlike(postId: string, user: User): Promise<Post> {
-    const post = await this.postRepo.findById(postId)
-    if (!post) {
-      throw new PostNotFoundError()
-    }
+    const post = await this.getPost(postId)
     const likes = post.likes ?? []
 
     post.likes = likes.filter((userLiked) => userLiked.id !== user.id)

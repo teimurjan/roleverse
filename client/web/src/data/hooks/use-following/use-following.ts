@@ -11,13 +11,13 @@ export type UseFollowingArgs = Omit<
 
 const DEFAULT_LIMIT = 15;
 
-const useFollowing = ({ walletAddress }: UseFollowingArgs) => {
+const useFollowing = ({ userId }: UseFollowingArgs) => {
   const { sdk } = useDataSdk();
   return useInfiniteQuery({
-    queryKey: [QueryKey.Following, walletAddress] as const,
+    queryKey: [QueryKey.Following, userId] as const,
     queryFn: ({ queryKey, pageParam }) => {
       return sdk.Following({
-        walletAddress: queryKey[1],
+        userId: queryKey[1],
         limit: DEFAULT_LIMIT,
         offset: pageParam,
       });

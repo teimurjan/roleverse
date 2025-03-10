@@ -1,5 +1,5 @@
-query FollowCount($walletAddress: String) {
-  followCount(walletAddress: $walletAddress) {
+query FollowCount($userId: String) {
+  followCount(userId: $userId) {
     following
     followers
   }

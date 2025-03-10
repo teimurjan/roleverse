@@ -4,7 +4,6 @@ import { useMutation } from "@tanstack/react-query";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -61,10 +60,9 @@ const PerkWithAction = ({
 
   return (
     <div key={perkKey} className={cn("flex items-center", className)}>
-      <Badge variant="secondary">{name}</Badge>
+      <span className="text-yellow-500">{name}</span>
       <Button
-        size="sm"
-        className="ml-auto h-auto py-1"
+        className="ml-auto"
         loading={isLoadingPerkStatus || isApplyingPerk}
         disabled={perkStatus !== "available"}
         onClick={handleButtonClick}

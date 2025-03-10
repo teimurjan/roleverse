@@ -1,23 +1,21 @@
 "use client";
 
-import { useAccount } from "wagmi";
-
-import UserList from "@/components/blocks/user-list";
+import UserList from "@/components/dumb/user-list";
 import useFollowers from "@/data/hooks/use-followers";
 
 interface FollowersListProps {
   className?: string;
+  userId: string;
 }
 
-const FollowersList = ({ className }: FollowersListProps) => {
-  const { address } = useAccount();
+const FollowersList = ({ className, userId }: FollowersListProps) => {
   const {
     data: followers,
     isPending,
     fetchNextPage,
     hasNextPage,
   } = useFollowers({
-    walletAddress: address,
+    userId,
   });
 
   const allFollowers = followers?.pages.flatMap((page) => page.followers) ?? [];
@@ -30,6 +28,7 @@ const FollowersList = ({ className }: FollowersListProps) => {
       fetchNextPage={fetchNextPage}
       loading={isPending}
       emptyText="You have no followers"
+      action="buy"
     />
   );
 };

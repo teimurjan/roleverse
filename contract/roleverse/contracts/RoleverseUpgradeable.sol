@@ -30,9 +30,7 @@ contract RoleverseUpgradeable is
 
   FeeManagerUpgradeable public feeManager;
 
-  function initialize(
-    address payable _feeManager
-  ) public initializer {
+  function initialize(address payable _feeManager) public initializer {
     __Ownable_init(msg.sender);
     __ReentrancyGuard_init();
     feeManager = FeeManagerUpgradeable(_feeManager);
@@ -45,21 +43,29 @@ contract RoleverseUpgradeable is
     emit TokenMinted(msg.sender);
   }
 
-  function getBuyPrice(address subject) public view returns (uint256) {
+  function getBasePrice(address subject) private view returns (uint256) {
     require(tokenSupply[subject] > 0, 'Token not minted');
     return bondingCurveConstant * tokenSupply[subject];
+  }
+
+  function getFee(address subject, uint256 basePrice) private view returns (uint256) {
+    uint256 feePercent = feeManager.getEffectiveFeePercent(msg.sender, subject);
+    uint256 fee = (basePrice * feePercent) / 10000;
+    return fee;
+  }
+
+  function getBuyPrice(address subject) public view returns (uint256) {
+    uint256 basePrice = getBasePrice(subject);
+    uint256 fee = getFee(subject, basePrice);
+    return basePrice + fee;
   }
 
   function buyShare(address subject) external payable nonReentrant {
     require(tokenSupply[subject] > 0, 'Target token not minted');
     require(tokenSupply[msg.sender] > 0, 'Buyer must mint first');
 
-    uint256 basePrice = getBuyPrice(subject);
-    uint256 feePercent = feeManager.getEffectiveFeePercent(
-      msg.sender,
-      subject
-    );
-    uint256 fee = (basePrice * feePercent) / 10000;
+    uint256 basePrice = getBasePrice(subject);
+    uint256 fee = getFee(subject, basePrice);
     uint256 totalCost = basePrice + fee;
     require(msg.value >= totalCost, 'Insufficient Ether sent');
 
@@ -75,10 +81,7 @@ contract RoleverseUpgradeable is
     require(balances[subject][msg.sender] > 0, 'No share to sell');
 
     uint256 refundBase = bondingCurveConstant * (supply - 1);
-    uint256 feePercent = feeManager.getEffectiveFeePercent(
-      msg.sender,
-      subject
-    );
+    uint256 feePercent = feeManager.getEffectiveFeePercent(msg.sender, subject);
     uint256 fee = (refundBase * feePercent) / 10000;
     uint256 refund = refundBase - fee;
 

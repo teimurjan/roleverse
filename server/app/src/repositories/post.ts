@@ -2,9 +2,10 @@ import Post from '@src/models/post'
 import { Inject, Service } from 'typedi'
 import { FindOptionsWhere, In, Repository } from 'typeorm'
 
-interface FindAllFilter {
-  liker?: string
+export interface FindAllFilter {
+  likedUserIds?: string[]
   walletAddresses?: string[]
+  userIds?: string[]
 }
 
 @Service()
@@ -13,17 +14,6 @@ class PostRepository {
     @Inject('TypeormPostRepository')
     private ormRepository: Repository<Post>,
   ) {}
-
-  async create(post: Post): Promise<Post> {
-    const entity = this.ormRepository.create({
-      text: post.text,
-      links: post.links,
-      tags: post.tags,
-      user: post.user,
-    })
-    await this.ormRepository.save(entity)
-    return entity
-  }
 
   async update(post: Post): Promise<Post> {
     await this.ormRepository.update(post.id, post)
@@ -63,13 +53,19 @@ class PostRepository {
 
     const where: FindOptionsWhere<Post>[] = []
 
-    if (filter.liker) {
-      where.push({ likes: { id: In([filter.liker]) } })
+    if (filter.likedUserIds) {
+      where.push({ likes: { id: In(filter.likedUserIds) } })
     }
 
     if (filter.walletAddresses) {
       where.push({
         user: { walletAddress: In(filter.walletAddresses) },
+      })
+    }
+
+    if (filter.userIds) {
+      where.push({
+        user: { id: In(filter.userIds) },
       })
     }
 

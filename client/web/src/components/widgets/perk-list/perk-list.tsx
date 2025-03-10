@@ -15,9 +15,9 @@ const PerkList = ({ className }: PerkListProps) => {
     <div className={className}>
       {isPending ? (
         <>
-          <Skeleton className="mb-1 h-6 w-full" />
-          <Skeleton className="mb-1 h-6 w-full" />
-          <Skeleton className="mb-1 h-6 w-full" />
+          <Skeleton className="mb-1 h-5 w-full" />
+          <Skeleton className="mb-1 h-5 w-full" />
+          <Skeleton className="mb-1 h-5 w-full" />
         </>
       ) : (
         perks?.map((perk) =>

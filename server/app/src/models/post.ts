@@ -6,10 +6,12 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 
+import Comment from './comment'
 import User from './user'
 
 @ObjectType()
@@ -27,9 +29,12 @@ class Post {
   @Field(() => User)
   user: User
 
+  @OneToMany(() => Comment, (comment) => comment.post, { lazy: true })
+  @JoinTable()
+  comments: Promise<Comment[]>
+
   @ManyToMany(() => User, { eager: true })
   @JoinTable()
-  @Field(() => [User], { nullable: true })
   likes: User[]
 
   @Column('text', { array: true, nullable: true })

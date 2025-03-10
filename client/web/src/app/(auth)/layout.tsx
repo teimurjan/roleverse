@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AppKitProvider } from "@/providers/appkit";
 import { AuthProvider } from "@/providers/auth";
 import { DataSdkProvider } from "@/providers/data-sdk";
+import { ThemeProvider } from "@/providers/theme";
 
 import "../globals.css";
 
@@ -34,12 +35,18 @@ export default function AuthLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Toaster />
-        <AppKitProvider>
-          <DataSdkProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </DataSdkProvider>
-        </AppKitProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          disableTransitionOnChange
+        >
+          <Toaster />
+          <AppKitProvider>
+            <DataSdkProvider>
+              <AuthProvider>{children}</AuthProvider>
+            </DataSdkProvider>
+          </AppKitProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

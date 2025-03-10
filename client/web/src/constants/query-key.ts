@@ -7,4 +7,7 @@ export enum QueryKey {
   Feed = "feed",
   Explore = "explore",
   Posts = "posts",
+  Post = "post",
+  User = "user",
+  Comments = "comments",
 }

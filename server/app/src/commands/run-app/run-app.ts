@@ -8,6 +8,7 @@ import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import config from '@src/config'
 import AuthResolver from '@src/resolvers/auth'
+import CommentResolver from '@src/resolvers/comment'
 import PostResolver from '@src/resolvers/post'
 import UserResolver from '@src/resolvers/user'
 import bodyParser from 'body-parser'
@@ -31,7 +32,7 @@ const runApp = async () => {
   const httpServer = http.createServer(app)
 
   const schema = await buildSchema({
-    resolvers: [AuthResolver, PostResolver, UserResolver],
+    resolvers: [AuthResolver, PostResolver, UserResolver, CommentResolver],
     emitSchemaFile: path.resolve(__dirname, '../../schema.graphql'),
     container: Container,
   })

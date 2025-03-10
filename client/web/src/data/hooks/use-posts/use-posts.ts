@@ -8,15 +8,16 @@ const DEFAULT_LIMIT = 15;
 
 type UsePostsArgs = Omit<PostsQueryVariables, "limit" | "offset">;
 
-const usePosts = ({ liked }: UsePostsArgs) => {
+const usePosts = ({ liked, userId }: UsePostsArgs) => {
   const { sdk } = useDataSdk();
   return useInfiniteQuery({
-    queryKey: [QueryKey.Posts, liked] as const,
+    queryKey: [QueryKey.Posts, liked, userId] as const,
     queryFn: ({ pageParam }) => {
       return sdk.Posts({
         limit: DEFAULT_LIMIT,
         offset: pageParam,
         liked,
+        userId,
       });
     },
     initialPageParam: 0,

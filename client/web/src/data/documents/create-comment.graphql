@@ -1,0 +1,5 @@
+mutation CreateComment($text: String!, $postId: String!) {
+  createComment(text: $text, postId: $postId) {
+    ...Comment_
+  }
+}

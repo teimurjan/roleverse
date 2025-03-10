@@ -1,0 +1,5 @@
+query Comments($limit: Int, $offset: Int, $postId: String!) {
+  comments(limit: $limit, offset: $offset, postId: $postId) {
+    ...Comment_
+  }
+}

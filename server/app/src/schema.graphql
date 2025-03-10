@@ -3,12 +3,22 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Comment {
+  createdAt: DateTimeISO!
+  id: ID!
+  tags: [User!]
+  text: String!
+  updatedAt: DateTimeISO!
+  user: User!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format.
 """
 scalar DateTimeISO
 
 type Mutation {
+  createComment(postId: String!, text: String!): Comment!
   createPost(text: String!): Post!
   generateChallenge(walletAddress: String!): String!
   likePost(postId: String!): Post!
@@ -19,9 +29,11 @@ type Mutation {
 }
 
 type Post {
+  commentsCount: Int!
   createdAt: DateTimeISO!
   id: ID!
-  likes: [User!]
+  isLiked: Boolean!
+  likesCount: Int!
   links: [String!]
   tags: [User!]
   text: String!
@@ -30,13 +42,16 @@ type Post {
 }
 
 type Query {
+  comments(limit: Int! = 10, offset: Int! = 0, postId: String!): [Comment!]!
   explore(limit: Int! = 10, offset: Int! = 0): [Post!]!
   feed(limit: Int! = 10, offset: Int! = 0): [Post!]!
-  followCount(walletAddress: String): UserFollowCount!
-  followers(limit: Int! = 10, offset: Int! = 0, walletAddress: String): [User!]!
-  following(limit: Int! = 10, offset: Int! = 0, walletAddress: String): [User!]!
+  followCount(userId: String): UserFollowCount!
+  followers(limit: Int! = 10, offset: Int! = 0, userId: String): [User!]!
+  following(limit: Int! = 10, offset: Int! = 0, userId: String): [User!]!
   me: User!
-  posts(liked: Boolean! = false, limit: Int! = 10, offset: Int! = 0): [Post!]!
+  post(postId: String!): Post!
+  posts(liked: Boolean! = false, limit: Int! = 10, offset: Int! = 0, userId: String): [Post!]!
+  user(id: String!): User!
 }
 
 type User {
