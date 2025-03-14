@@ -4,7 +4,7 @@ import config from "@/config";
 
 import { getSdk } from "../generated/get-sdk";
 
-const getPublicSdk = () => {
+const buildSdk = () => {
   const client = new GraphQLClient(config.graphql_url, {
     credentials: "include",
     mode: "cors",
@@ -12,4 +12,4 @@ const getPublicSdk = () => {
   return getSdk(client);
 };
 
-export default getPublicSdk;
+export default buildSdk;

@@ -102,10 +102,11 @@ export type Query = {
   followCount: UserFollowCount;
   followers: Array<User>;
   following: Array<User>;
+  likedPosts: Array<Post>;
   me: User;
   post: Post;
-  posts: Array<Post>;
   user: User;
+  userPosts: Array<Post>;
 };
 
 
@@ -147,21 +148,26 @@ export type QueryFollowingArgs = {
 };
 
 
+export type QueryLikedPostsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+};
+
+
 export type QueryPostArgs = {
   postId: Scalars['String']['input'];
 };
 
 
-export type QueryPostsArgs = {
-  liked?: Scalars['Boolean']['input'];
-  limit?: Scalars['Int']['input'];
-  offset?: Scalars['Int']['input'];
-  userId?: InputMaybe<Scalars['String']['input']>;
+export type QueryUserArgs = {
+  id: Scalars['String']['input'];
 };
 
 
-export type QueryUserArgs = {
-  id: Scalars['String']['input'];
+export type QueryUserPostsArgs = {
+  limit?: Scalars['Int']['input'];
+  offset?: Scalars['Int']['input'];
+  userId: Scalars['String']['input'];
 };
 
 export type User = {
@@ -260,6 +266,14 @@ export type LikePostMutationVariables = Exact<{
 
 export type LikePostMutation = { __typename?: 'Mutation', likePost: { __typename?: 'Post', id: string } };
 
+export type LikedPostsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type LikedPostsQuery = { __typename?: 'Query', likedPosts: Array<{ __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
+
 export type LogOutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -278,16 +292,6 @@ export type PostQueryVariables = Exact<{
 
 
 export type PostQuery = { __typename?: 'Query', post: { __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null } };
-
-export type PostsQueryVariables = Exact<{
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  liked?: InputMaybe<Scalars['Boolean']['input']>;
-  userId?: InputMaybe<Scalars['String']['input']>;
-}>;
-
-
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
 
 export type RegisterMutationVariables = Exact<{
   signature: Scalars['String']['input'];
@@ -312,6 +316,15 @@ export type UnlikePostMutationVariables = Exact<{
 
 
 export type UnlikePostMutation = { __typename?: 'Mutation', unlikePost: { __typename?: 'Post', id: string } };
+
+export type UserPostsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type UserPostsQuery = { __typename?: 'Query', userPosts: Array<{ __typename?: 'Post', id: string, text: string, isLiked: boolean, likesCount: number, commentsCount: number, links?: Array<string> | null, createdAt: any, updatedAt: any, user: { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }, tags?: Array<{ __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any }> | null }> };
 
 export type User_Fragment = { __typename?: 'User', id: string, walletAddress: string, username: string, createdAt: any, updatedAt: any };
 
@@ -432,6 +445,13 @@ export const LikePostDocument = gql`
   }
 }
     `;
+export const LikedPostsDocument = gql`
+    query LikedPosts($limit: Int, $offset: Int) {
+  likedPosts(limit: $limit, offset: $offset) {
+    ...Post_
+  }
+}
+    ${Post_FragmentDoc}`;
 export const LogOutDocument = gql`
     mutation LogOut {
   logOut
@@ -447,13 +467,6 @@ export const MeDocument = gql`
 export const PostDocument = gql`
     query Post($postId: String!) {
   post(postId: $postId) {
-    ...Post_
-  }
-}
-    ${Post_FragmentDoc}`;
-export const PostsDocument = gql`
-    query Posts($limit: Int, $offset: Int, $liked: Boolean, $userId: String) {
-  posts(limit: $limit, offset: $offset, liked: $liked, userId: $userId) {
     ...Post_
   }
 }
@@ -479,6 +492,13 @@ export const UnlikePostDocument = gql`
   }
 }
     `;
+export const UserPostsDocument = gql`
+    query UserPosts($limit: Int, $offset: Int, $userId: String!) {
+  userPosts(limit: $limit, offset: $offset, userId: $userId) {
+    ...Post_
+  }
+}
+    ${Post_FragmentDoc}`;
 export const UserDocument = gql`
     query User($id: String!) {
   user(id: $id) {
@@ -524,6 +544,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     LikePost(variables: LikePostMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<LikePostMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<LikePostMutation>(LikePostDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LikePost', 'mutation', variables);
     },
+    LikedPosts(variables?: LikedPostsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<LikedPostsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<LikedPostsQuery>(LikedPostsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LikedPosts', 'query', variables);
+    },
     LogOut(variables?: LogOutMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<LogOutMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<LogOutMutation>(LogOutDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'LogOut', 'mutation', variables);
     },
@@ -533,9 +556,6 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     Post(variables: PostQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PostQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<PostQuery>(PostDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Post', 'query', variables);
     },
-    Posts(variables?: PostsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<PostsQuery> {
-      return withWrapper((wrappedRequestHeaders) => client.request<PostsQuery>(PostsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Posts', 'query', variables);
-    },
     Register(variables: RegisterMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<RegisterMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<RegisterMutation>(RegisterDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Register', 'mutation', variables);
     },
@@ -544,6 +564,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     UnlikePost(variables: UnlikePostMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UnlikePostMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UnlikePostMutation>(UnlikePostDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UnlikePost', 'mutation', variables);
+    },
+    UserPosts(variables: UserPostsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UserPostsQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UserPostsQuery>(UserPostsDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UserPosts', 'query', variables);
     },
     User(variables: UserQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UserQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<UserQuery>(UserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'User', 'query', variables);

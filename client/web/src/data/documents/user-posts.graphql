@@ -1,0 +1,5 @@
+query UserPosts($limit: Int, $offset: Int, $userId: String!) {
+  userPosts(limit: $limit, offset: $offset, userId: $userId) {
+    ...Post_
+  }
+}

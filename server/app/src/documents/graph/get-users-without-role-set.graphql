@@ -1,0 +1,16 @@
+query GetUsersWithoutRoleSet {
+  users(where: { role: null }) {
+    id
+    perks {
+      id
+      perk {
+        id
+        expiration
+        name
+      }
+    }
+    role {
+      id
+    }
+  }
+}

@@ -98,6 +98,18 @@ class GraphService {
 
     return users
   }
+
+  async getUserWithRoleSet() {
+    const users = await this.sdk.GetUsersWithRoleSet()
+
+    return users
+  }
+
+  async getUserWithoutRoleSet() {
+    const users = await this.sdk.GetUsersWithoutRoleSet()
+
+    return users
+  }
 }
 
 export default GraphService

@@ -17,7 +17,7 @@ const useTokenBalance = ({
     abi: RoleverseUpgradeableABI,
     address: config.roleverse_contract_address,
     functionName: "balances",
-    args: [ownerAddress ?? zeroAddress, subjectAddress ?? zeroAddress],
+    args: [subjectAddress ?? zeroAddress, ownerAddress ?? zeroAddress],
     query: {
       enabled: !!ownerAddress && !!subjectAddress,
     },

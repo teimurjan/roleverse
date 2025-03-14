@@ -898,6 +898,40 @@ export type GetUsersByRoleQuery = {
   }>
 }
 
+export type GetUsersWithRoleSetQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetUsersWithRoleSetQuery = {
+  __typename?: 'Query'
+  users: Array<{
+    __typename?: 'User'
+    id: string
+    perks: Array<{
+      __typename?: 'PerkOwnership'
+      id: string
+      perk: { __typename?: 'Perk'; id: string; expiration: any; name: string }
+    }>
+    role?: { __typename?: 'Role'; id: string } | null
+  }>
+}
+
+export type GetUsersWithoutRoleSetQueryVariables = Exact<{
+  [key: string]: never
+}>
+
+export type GetUsersWithoutRoleSetQuery = {
+  __typename?: 'Query'
+  users: Array<{
+    __typename?: 'User'
+    id: string
+    perks: Array<{
+      __typename?: 'PerkOwnership'
+      id: string
+      perk: { __typename?: 'Perk'; id: string; expiration: any; name: string }
+    }>
+    role?: { __typename?: 'Role'; id: string } | null
+  }>
+}
+
 export const GetHoldingHoldersCountDocument = gql`
   query GetHoldingHoldersCount($walletAddress: ID!) {
     user(id: $walletAddress) {
@@ -1013,6 +1047,42 @@ export const GetUsersByOmittingRoleDocument = gql`
 export const GetUsersByRoleDocument = gql`
   query GetUsersByRole($role: ID!) {
     users(where: { role_: { id: $role } }) {
+      id
+      perks {
+        id
+        perk {
+          id
+          expiration
+          name
+        }
+      }
+      role {
+        id
+      }
+    }
+  }
+`
+export const GetUsersWithRoleSetDocument = gql`
+  query GetUsersWithRoleSet {
+    users(where: { role_not: null }) {
+      id
+      perks {
+        id
+        perk {
+          id
+          expiration
+          name
+        }
+      }
+      role {
+        id
+      }
+    }
+  }
+`
+export const GetUsersWithoutRoleSetDocument = gql`
+  query GetUsersWithoutRoleSet {
+    users(where: { role: null }) {
       id
       perks {
         id
@@ -1154,6 +1224,38 @@ export function getSdk(
             { ...requestHeaders, ...wrappedRequestHeaders },
           ),
         'GetUsersByRole',
+        'query',
+        variables,
+      )
+    },
+    GetUsersWithRoleSet(
+      variables?: GetUsersWithRoleSetQueryVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+    ): Promise<GetUsersWithRoleSetQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetUsersWithRoleSetQuery>(
+            GetUsersWithRoleSetDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders },
+          ),
+        'GetUsersWithRoleSet',
+        'query',
+        variables,
+      )
+    },
+    GetUsersWithoutRoleSet(
+      variables?: GetUsersWithoutRoleSetQueryVariables,
+      requestHeaders?: GraphQLClientRequestHeaders,
+    ): Promise<GetUsersWithoutRoleSetQuery> {
+      return withWrapper(
+        (wrappedRequestHeaders) =>
+          client.request<GetUsersWithoutRoleSetQuery>(
+            GetUsersWithoutRoleSetDocument,
+            variables,
+            { ...requestHeaders, ...wrappedRequestHeaders },
+          ),
+        'GetUsersWithoutRoleSet',
         'query',
         variables,
       )

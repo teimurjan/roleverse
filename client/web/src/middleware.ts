@@ -9,6 +9,7 @@ const protectedRoutes = [
   /^\/profile\/([0-9a-fA-F-]{36})$/,
   /^\/followers\/([0-9a-fA-F-]{36})$/,
   /^\/following\/([0-9a-fA-F-]{36})$/,
+  /^\/post\/([0-9a-fA-F-]{36})$/,
 ];
 const authRoute = "/auth";
 

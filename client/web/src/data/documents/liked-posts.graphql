@@ -1,0 +1,5 @@
+query LikedPosts($limit: Int, $offset: Int) {
+  likedPosts(limit: $limit, offset: $offset) {
+    ...Post_
+  }
+}

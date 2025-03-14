@@ -23,19 +23,22 @@ class PostResolver {
 
   @Query(() => [Post])
   @UseMiddleware(AuthorizationMiddleware, MintingMiddleware)
-  async posts(
+  async userPosts(
     @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
     @Arg('offset', () => Int, { defaultValue: 0 }) offset: number,
-    @Arg('liked', () => Boolean, { defaultValue: false }) liked: boolean,
-    @Arg('userId', () => String, { nullable: true }) userId: string | null,
+    @Arg('userId', () => String) userId: string,
+  ): Promise<Post[]> {
+    return this.postService.getUserPosts(limit, offset, userId)
+  }
+
+  @Query(() => [Post])
+  @UseMiddleware(AuthorizationMiddleware, MintingMiddleware)
+  async likedPosts(
+    @Arg('limit', () => Int, { defaultValue: 10 }) limit: number,
+    @Arg('offset', () => Int, { defaultValue: 0 }) offset: number,
     @Ctx('user') user: User,
   ): Promise<Post[]> {
-    return this.postService.getPosts(
-      limit,
-      offset,
-      liked ? user : undefined,
-      userId ?? undefined,
-    )
+    return this.postService.getLikedPosts(limit, offset, user.id)
   }
 
   @Query(() => Post)

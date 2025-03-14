@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import AppHeader from "@/components/widgets/app-header";
 import AppRightSidebar from "@/components/widgets/app-right-sidebar";
 import AppSidebar from "@/components/widgets/app-sidebar";
+import MintDialog from "@/components/widgets/mint-dialog";
 import { AppKitProvider } from "@/providers/appkit";
 import { AuthProvider } from "@/providers/auth";
 import { DataSdkProvider } from "@/providers/data-sdk";
@@ -35,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -78,6 +79,8 @@ export default function RootLayout({
 
                       <AppRightSidebar className="flex-[18rem] flex-grow-0 border-l" />
                     </main>
+
+                    <MintDialog />
                   </SidebarProvider>
                 </SidebarProvider>
               </AuthProvider>

@@ -54,14 +54,22 @@ class PostService {
     return await this.postRepo.save(post)
   }
 
-  async getPosts(
+  async getLikedPosts(
     limit: number,
     offset: number,
-    liker?: User,
+    userId: string,
+  ): Promise<Post[]> {
+    return await this.postRepo.findAll(limit, offset, {
+      likedUserIds: [userId],
+    })
+  }
+
+  async getUserPosts(
+    limit: number,
+    offset: number,
     userId?: string,
   ): Promise<Post[]> {
     return await this.postRepo.findAll(limit, offset, {
-      likedUserIds: liker ? [liker.id] : undefined,
       userIds: userId ? [userId] : undefined,
     })
   }
@@ -110,13 +118,13 @@ class PostService {
     const feedUserWalletAddresses: Set<string> = new Set([user.walletAddress])
 
     const graphUser = await this.graphService.getUser(user.walletAddress)
-    const roleId = graphUser.user?.role?.id
-    if (roleId) {
-      const sameRoleUsers = await this.graphService.getUsersByRole(roleId)
-      sameRoleUsers.users.forEach((user) => {
-        feedUserWalletAddresses.add(user.id)
-      })
-    }
+    const roleId = graphUser.user?.role?.id?.toLowerCase()
+    const sameRoleUsers = roleId
+      ? await this.graphService.getUsersByRole(roleId)
+      : await this.graphService.getUserWithoutRoleSet()
+    sameRoleUsers.users.forEach((user) => {
+      feedUserWalletAddresses.add(user.id)
+    })
 
     const following = await this.graphService.getFollowing(
       user.walletAddress,
@@ -136,11 +144,17 @@ class PostService {
     const feedUserWalletAddresses: Set<string> = new Set([])
 
     const graphUser = await this.graphService.getUser(user.walletAddress)
-    const roleId = graphUser.user?.role?.id
+    const roleId = graphUser.user?.role?.id?.toLowerCase()
     if (roleId) {
       const otherRoleUsers =
         await this.graphService.getUsersByOmittingRole(roleId)
-      otherRoleUsers.users.forEach((user) => {
+      const noRoleUsers = await this.graphService.getUserWithoutRoleSet()
+      ;[...otherRoleUsers.users, ...noRoleUsers.users].forEach((user) => {
+        feedUserWalletAddresses.add(user.id)
+      })
+    } else {
+      const usersWithRoleSet = await this.graphService.getUserWithRoleSet()
+      usersWithRoleSet.users.forEach((user) => {
         feedUserWalletAddresses.add(user.id)
       })
     }

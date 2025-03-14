@@ -1,5 +1,0 @@
-query Posts($limit: Int, $offset: Int, $liked: Boolean, $userId: String) {
-  posts(limit: $limit, offset: $offset, liked: $liked, userId: $userId) {
-    ...Post_
-  }
-}

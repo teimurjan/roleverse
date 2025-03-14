@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 
 import {
@@ -18,13 +19,14 @@ import { useAuth } from "@/providers/auth";
 
 const MintDialog = () => {
   const { address } = useAccount();
-  const { data: tokenSupply, refetch } = useTokenSupply({ address });
+  const queryClient = useQueryClient()
+  const { data: tokenSupply } = useTokenSupply({ address });
   const mint = useMint();
   const { logOut } = useAuth();
 
   const handleMintClick = async () => {
     await mint();
-    await refetch();
+    await queryClient.invalidateQueries();
   };
 
   return (

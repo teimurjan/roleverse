@@ -3,6 +3,9 @@ COMPOSE_FILE=./docker/development/docker-compose.yml
 DOCKER_COMPOSE=docker-compose -p $(PROJECT_NAME) -f $(COMPOSE_FILE) --env-file=./.env.docker
 
 up:
+	$(DOCKER_COMPOSE) up -d $(SERVICE)
+
+up-build:
 	$(DOCKER_COMPOSE) up -d --build $(SERVICE)
 
 down:

@@ -4,9 +4,10 @@ import { QueryKey } from "@/constants/query-key";
 import {
   ExploreQuery,
   FeedQuery,
+  LikedPostsQuery,
   Post_Fragment,
   PostQuery,
-  PostsQuery,
+  UserPostsQuery,
 } from "@/data/generated/get-sdk";
 
 const useSetPost = () => {
@@ -45,14 +46,30 @@ const useSetPost = () => {
       }
     );
 
-    queryClient.setQueryData<InfiniteData<PostsQuery>>(
-      [QueryKey.Posts],
+    queryClient.setQueriesData<InfiniteData<UserPostsQuery>>(
+      { queryKey: [QueryKey.UserPosts] },
       (data) => {
         if (data) {
           return {
             ...data,
             pages: data.pages.map((page) => ({
-              posts: page.posts.map((post) =>
+              userPosts: page.userPosts.map((post) =>
+                post.id === postId ? setter(post) : post
+              ),
+            })),
+          };
+        }
+      }
+    );
+
+    queryClient.setQueryData<InfiniteData<LikedPostsQuery>>(
+      [QueryKey.LikedPosts],
+      (data) => {
+        if (data) {
+          return {
+            ...data,
+            pages: data.pages.map((page) => ({
+              likedPosts: page.likedPosts.map((post) =>
                 post.id === postId ? setter(post) : post
               ),
             })),

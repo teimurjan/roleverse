@@ -27,6 +27,7 @@ const AuthorizationMiddleware: MiddlewareFn<GQLContext> = async (
     context.user = user
     return next()
   } catch (_e) {
+    context.res.clearCookie('token')
     throw new GraphQLError('Unauthorized: invalid token', {
       extensions: { code: ApolloServerErrorCode.BAD_REQUEST },
     })

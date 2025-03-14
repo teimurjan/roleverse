@@ -31,7 +31,7 @@ const UserProfileHeader = ({ userId }: UserProfileHeaderProps) => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-4">
         <Avatar className="w-16 h-16">
           <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
           <AvatarFallback className="text-2xl">
@@ -47,23 +47,33 @@ const UserProfileHeader = ({ userId }: UserProfileHeaderProps) => {
           </div>
         )}
 
-        <div className="text-sm ml-auto mr-2">
-          Price: <b>{price ? formatEther(price) : "0"} ETH</b>
-        </div>
+        <div className="ml-auto">
+          <div className="flex items-center justify-end gap-4">
+            {userAddress && <BuyTokenButton tokenAddress={userAddress} />}
+            {userAddress && (
+              <SellTokenButton
+                variant="secondary"
+                disabled={!balance || balance === BigInt(0)}
+                tokenAddress={userAddress}
+              />
+            )}
+          </div>
 
-        <div className="flex items-center justify-end gap-4">
-          {userAddress && <BuyTokenButton tokenAddress={userAddress} />}
-          {userAddress && (
-            <SellTokenButton
-              variant="secondary"
-              disabled={!balance || balance === BigInt(0)}
-              tokenAddress={userAddress}
-            />
-          )}
+          <div className="text-sm mt-2">
+            Price: {price ? formatEther(price) : "0"} ETH
+          </div>
         </div>
       </div>
 
-      <FollowCount userId={user?.user.id} />
+      <div className="flex items-center justify-between">
+        <FollowCount userId={user?.user.id} />
+
+        {typeof balance === "bigint" && (
+          <div className="text-sm font-bold text-slate-500">
+            You have {balance} token{balance === BigInt(1) ? "" : "s"}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
